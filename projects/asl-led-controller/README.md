@@ -59,19 +59,44 @@ Step by step:
 
 ## Setup
 
-### 1. Flash the STM32
+### 1. Connect the Nucleo to your computer
+
+The Nucleo-G474RE connects over a standard **Mini-USB cable** (the same type used by older Android phones and Arduino boards).
+
+Steps:
+1. Locate the **Mini-USB port on the ST-Link end** of the Nucleo board — it's on the top half of the board, opposite the Arduino headers, labelled **CN1**
+2. Plug the Mini-USB end into the Nucleo and the USB-A end into your computer
+3. The board should power on — the **LD1 (COM) LED** near the USB port will blink red/green while the ST-Link enumerates, then settle to a solid colour
+4. On **Mac/Linux**, the board shows up automatically as a serial port. Verify it appeared:
+
+```bash
+ls /dev/tty.*
+```
+
+You should see something like `/dev/tty.usbmodemXXXX`. If nothing shows up:
+- Try a different USB cable (some cables are charge-only with no data lines)
+- On Mac, check System Settings → Privacy & Security → Developer Tools / USB if prompted
+- On Linux, add yourself to the `dialout` group: `sudo usermod -aG dialout $USER` then log out and back in
+
+5. On **Windows**, Windows will install the ST-Link driver automatically. The port shows as `COMx` in Device Manager under "Ports (COM & LPT)". If it doesn't appear, download the ST-Link USB driver from st.com.
+
+> **No drivers needed on Mac or Linux.** The Nucleo uses the ST-Link's built-in USB-CDC (Virtual COM Port) which the OS supports natively.
+
+---
+
+### 2. Flash the STM32
 
 1. Open **STM32CubeIDE** and create a new project for the **Nucleo-G474RE**
 2. Replace the generated `Core/Src/main.c` with `stm32_main.c` from this folder
 3. Build and flash via the ST-Link (Run → Debug or Run)
 
-### 2. Install Python dependencies
+### 3. Install Python dependencies
 
 ```bash
 pip install torch torchvision mediapipe opencv-python pillow huggingface_hub pyserial
 ```
 
-### 3. Find your serial port
+### 4. Find your serial port
 
 Plug in the Nucleo via USB, then run:
 
@@ -81,7 +106,7 @@ ls /dev/tty.*
 
 Look for something like `/dev/tty.usbmodemXXXX`. The script will try to auto-detect it. If it fails, open `asl_webcam.py` and set `SERIAL_PORT` manually at the top of the serial setup section.
 
-### 4. Run
+### 5. Run
 
 ```bash
 python asl_webcam.py
