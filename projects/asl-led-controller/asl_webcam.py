@@ -91,7 +91,7 @@ def find_stm32_port():
             return port.device
     return None
 
-SERIAL_PORT = find_stm32_port() or "/dev/tty.usbmodemXXXX"  # edit if auto-detect fails
+SERIAL_PORT = find_stm32_port() or "/dev/tty.usbmodem1103"
 BAUD_RATE = 115200
 
 try:
@@ -135,6 +135,12 @@ try:
         now_ms = int(time.time() * 1000)
         results = hands.detect_for_video(mp_image, now_ms)
 
+        if not results.hand_landmarks:
+            command = b'O'
+            if ser and command != last_command:
+                ser.write(command)
+                last_command = command
+
         if results.hand_landmarks:
             landmarks = results.hand_landmarks[0]
 
@@ -165,7 +171,12 @@ try:
                 confidence = top_prob.item() * 100
 
                 # Send command to STM32 only when prediction changes
-                command = b'L' if predicted_class == 'L' else b'R'
+                if predicted_class == 'N':
+                    command = b'A'
+                elif predicted_class == 'O':
+                    command = b'C'
+                else:
+                    command = b'O'
                 if ser and command != last_command:
                     ser.write(command)
                     last_command = command
